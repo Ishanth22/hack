@@ -1,0 +1,39 @@
+services:
+  # ----------------------------------------
+  # Backend: FastAPI Web Service
+  # ----------------------------------------
+  - type: web
+    name: startup-monitor-backend
+    env: python
+    region: oregon
+    rootDir: backend
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: MONGO_URI
+        sync: false # You will provide this value in the Render Dashboard
+      - key: NEWS_API_KEY
+        sync: false # You will provide this value in the Render Dashboard
+      - key: ALLOWED_ORIGINS
+        value: "*"
+        
+  # ----------------------------------------
+  # Frontend: React Static Site
+  # ----------------------------------------
+  - type: web
+    name: startup-monitor-frontend
+    env: static
+    region: oregon
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "./dist"
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: startup-monitor-backend
+          property: host
+        # The URL of the backend will be automatically injected here
+      # NOTE: For Static Sites, Render doesn't support fromService at build time natively for all cases, 
+      # but it's officially supported for environment variables in static sites if connected locally.
+      # If this doesn't work, we'll manually set VITE_API_URL.
