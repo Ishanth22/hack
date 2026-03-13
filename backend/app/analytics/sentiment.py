@@ -2,6 +2,11 @@ import os
 import requests
 from typing import List, Dict, Any, Optional
 
+from dotenv import load_dotenv
+# Load .env file from the project root (one level above backend directory)
+dotenv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.env"))
+load_dotenv(dotenv_path)
+
 try:
     from textblob import TextBlob
     TEXTBLOB_AVAILABLE = True
